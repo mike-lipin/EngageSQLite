@@ -1,4 +1,0 @@
-select t.Id, t.Name
-from EventItemTypeEventItem e
-  join EventItemType t on t.Id = e.EventItemTypeId
-where e.EventItemId = @eventItemId

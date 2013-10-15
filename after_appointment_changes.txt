@@ -1,7 +1,0 @@
----- after any appointment changes you must execute folowing queries in that order ----
-
-    delete from private.AppointmentSearch
-
-    insert into private.AppointmentSearch (UniqueId, SearchText)
-    select UniqueId, ifnull(Subject, '') || ' ' || ifnull(Location, '')
-    from private.Appointment

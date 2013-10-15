@@ -1,5 +1,0 @@
-select Id, UniqueId, EventItemId, Url, Name, FileSize
-from [Handout]
-where EventItemId = @eventItemId
-order by Id
-limit @selectNumberOfRecords offset @skipNumberOfRecords

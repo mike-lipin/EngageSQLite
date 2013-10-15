@@ -1,0 +1,63 @@
+---- new version with FTS search ----
+SELECT ei.Id, ei.UniqueId, ei.Title as Name, ei.Title, ei.Description as Topic, ei.Description
+     , tt.DateFrom, tt.DateTo, ei.IsOpen, ei.IsRateConfigured, ei.FacebookUrl, ei.TwitterHashTag
+     , ei.IsHidden, eif.Speakers, ei.Location, ei.ImageUrl, eif.IsPoster
+     , eif.FeaturedEventItem
+     , (select r.Value from Rating r where r.UniqueId = ei.UniqueId) as Rating
+     , (select 1 from private.Rate r where r.RatedUniqueId = ei.UniqueId and ifnull(r.Status, '') <> 'deleted') as IsRated
+     , (select 1 from private.Favorite f where f.FavoritedUniqueId = ei.UniqueId and ifnull(f.Status, '') <> 'deleted') as IsFavorite
+from EventItem ei
+  join (select e.Id, e.DateFrom, e.HourFrom, e.Featured as FeaturedEventItem, es.Speakers, e.NameSortId, e.FirstAlpha, e.TimeId, e.IsPoster
+        from EventItemSort e 
+          join EventItemSearch es on es.Id = e.Id
+        where EventItemSearch match 'keyword otherkeyword anotherkeyword' and e.IsHidden = 0
+        order by e.Featured desc, e.DateFrom, e.HourFrom, e.NameSortId
+        limit @selectNumberOfRecords offset @skipNumberOfRecords) eif on eif.Id = ei.Id
+  join EventItemTimeTable tt on tt.Id = eif.TimeId
+order by eif.FeaturedEventItem desc, eif.DateFrom, eif.HourFrom, eif.NameSortId
+
+
+---- this new version does not need modificate where section ----
+---- you need to change 'keyword otherkeyword anotherkeyword' only ----
+
+---- for filtering by different conditions add one or few of condition before "order by" section:
+
+---- for filtering by few Ids add to where clause: ----
+and e.Id in (idsstring)
+
+---- idsstring - is a string with comma separated Id values: 11,45,34563,234 ----
+
+
+---- for filtering by EventItemTypeId add to where clause: ----
+and exists(select 1 from EventItemTypeEventItem ete where ete.EventItemId = e.Id and ete.EventItemTypeId = @eventItemTypeId)
+---- and fill parameter @eventItemTypeId ----
+
+
+---- for filtering by Speaker add to where clause: ----
+and exists(select 1 from EventItemParticipant eip where eip.EventItemId = e.Id and eip.ParticipantId = @speakerId)
+
+---- and fill parameter @speakerId ----
+
+---- for filtering by Track add to where clause: ----
+and exists(select 1 from EventItemTrack eit where eit.EventItemId = e.Id and eit.TrackId = @trackId)
+
+---- and fill parameter @trackId ----
+
+
+---- for filtering by few Tracks add to where clause: ----
+and exists(select 1 from EventItemTrack eit where eit.EventItemId = e.Id and eit.TrackId in (trackIds))
+
+---- trackIds - is a string with comma separated Id values: 11,45,34563,234 ----
+
+---- for filtering by Id add to where clause: ----
+and e.Id = @id
+
+
+---- for filtering by date add to where clause: ----
+and e.DateFrom >= @dateFrom 
+and e.DateFrom <= @dateTo
+
+---- you may add only one of this conditions ----
+---- @dateFrom and @dateTo - must be in format: yyyy-mm-ddThh:nn:ss ----
+---- but if @dateFrom = '2013-02-02T00:00:00' and @dateTo = '2013-02-02T00:00:00' you do net get session, that begin at 2013-02-02 10:10:00 and end at 2013-02-02 12:10:00 ----
+---- if you want get data for day 2013-02-02, you must set @dateTo = '2013-02-02T23:59:59' ----

@@ -1,0 +1,90 @@
+---- after import delta from json you must execute folowing queries in that order ----
+
+    delete from EventItemSearch
+
+    delete from ExhibitorSearch
+
+    delete from ParticipantSearch
+
+    insert into EventItemSearch (Id, SearchText, Speakers)
+    select ei.Id, ifnull(ei.Title, '') || ' ' || ifnull(ei.Description, '') || ' ' || ifnull(ei.Location, ''),
+      (select trim(group_concat(' ' || trim(ifnull(p.FirstName, '') || ' ' || ifnull(p.LastName, ''))))
+       from EventItemParticipant eip join Participant p on p.Id = eip.ParticipantId 
+       where eip.EventItemId = ei.Id)
+    from [EventItem] ei
+
+    insert into ExhibitorSearch (Id, SearchText, BoothNumbers, FloorMapIds)
+    select e.Id, ifnull(e.CompanyName, '') || ' ' ||
+      ifnull(e.FacilityName, '') || ' ' || ifnull(e.Address1, '') || ' ' || ifnull(e.Address2, '') || ' ' || ifnull(e.CityName, '') 
+        || ' ' || ifnull(e.StateName, '') || ' ' || ifnull(e.PostalCode, '') || ' ' || ifnull(e.CountryName, '') || ' ' ||
+      ifnull(e.Description, '') || ' ' ||
+      ifnull((select group_concat(ifnull(p.Name, '') || ' ' || ifnull(p.Description, ''))
+       from Product p 
+       where p.ExhibitorId = e.Id), ''),
+      (select group_concat(b.Number, ', ')
+       from Booth b
+       where b.ExhibitorId = e.Id) as BoothNumbers,
+      (select trim(group_concat(distinct ' ' || b.FloorMapIds))
+       from Booth b
+       where b.ExhibitorId = e.Id) as FloorMapIds
+    from Exhibitor e
+
+    insert into ParticipantSearch (Id, SearchText, RegistrationTypeCode)
+    select s.Id, ifnull(s.FirstName, '') || ' ' || ifnull(s.LastName, '') || ' ' ||
+      ifnull(s.Email, '') || ' ' || ifnull(s.Phone, '') || ' ' || ifnull(s.CompanyName, '') || ' ' || ifnull(s.BusinessTitle, '') || ' ' || 
+      ifnull(s.Location, '') || ' ' || ifnull(s.SocialBio, ''), 
+      s.RegistrationTypeCode
+    from Participant s
+
+    delete from ExhibitorSort
+
+    insert into ExhibitorSort (Id, FirstAlpha, Featured, Section, UniqueId)
+    select Id, substr(lower(CompanyName), 1, 1),
+           ifnull((select 1 from ExhibitorSponsorship where ExhibitorId = Exhibitor.Id), 0),
+           ifnull((select " Featured" from ExhibitorSponsorship where ExhibitorId = Exhibitor.Id), substr(lower(CompanyName), 1, 1)),
+           UniqueId
+    from Exhibitor
+    order by lower(CompanyName)
+
+    delete from EventItemSort
+
+    insert into EventItemSort (Id, DateFrom, DateTo, HourFrom, SectionDate, SectionHour, Featured, IsHidden, FirstAlpha, TimeId, IsPoster)
+    select ei.Id, substr(tt.DateFrom, 1, 10), substr(tt.DateTo, 1, 10), cast(substr(tt.DateFrom, 12, 2) as int), 
+           ifnull((select " Featured" from EventItemSponsorship where EventItemId = ei.Id), substr(tt.DateFrom, 1, 10)),
+           ifnull((select -1 from EventItemSponsorship where EventItemId = ei.Id), substr(tt.DateFrom, 12, 5)),
+           ifnull((select 1 from EventItemSponsorship where EventItemId = ei.Id), 0),
+           ei.IsHidden, substr(lower(ei.Title), 1, 1), tt.Id, ei.IsPoster
+    from 
+      (select e.*,
+           case
+             when exists(select * 
+                         from EventItemTypeEventItem l 
+                           join EventItemType t on t.Id = l.EventItemTypeId
+                         where l.EventItemId = e.Id and t.IsPoster = 1)
+             then 1
+             else 0
+           end as IsPoster
+         from EventItem e) ei         
+      join EventItemTimeTable tt on tt.EventItemId = ei.Id
+    order by lower(ei.Title)
+
+
+    update ProductCategory
+    set NodePath = ProductCategory.Id, NodeLevel = 1
+    where ParentId is null
+
+    delete from ProductSearch
+
+    insert into ProductSearch (Id, SearchText, BoothNumbers)
+    select p.Id, ifnull(p.Name, '') || ' ' || ifnull(p.Description, '') || ' ' || ifnull(e.CompanyName, ''),
+           trim(ifnull((select group_concat(' ' || b.Number) 
+                     from ProductBooth pb 
+                       join Booth b on b.Id = pb.BoothId
+                     where pb.ProductId = p.Id
+                     order by b.Number), 
+                  (select trim(group_concat(' ' || b.Number))
+                     from Booth b
+                     where b.ExhibitorId = e.Id
+                     order by b.Number)))
+    from [Product] p
+      join [Exhibitor] e on e.Id = p.ExhibitorId

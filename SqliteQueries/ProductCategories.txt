@@ -1,0 +1,82 @@
+---- full list without tree + count of exhibitors
+select pc.Id, pc.UniqueId, pc.Name, pc.ParentId, pc.NodePath, pc.NodeLevel,
+       (select count(distinct epc.ExhibitorId)
+        from ProductCategory pc2
+          join ExhibitorProductCategory epc on pc2.Id = epc.ProductCategoryId
+        where pc2.NodePath >= pc.NodePath and pc2.NodePath <= pc.NodePath || 'a') as ExhibitorCount
+from [ProductCategory] pc
+order by lower(Name)
+limit @selectNumberOfRecords offset @skipNumberOfRecords
+
+
+---- top level + count of exhibitors
+select pc.Id, pc.UniqueId, pc.Name, pc.ParentId, pc.NodePath, pc.NodeLevel,
+       (select count(distinct epc.ExhibitorId)
+        from ProductCategory pc2
+          join ExhibitorProductCategory epc on pc2.Id = epc.ProductCategoryId
+        where pc2.NodePath >= pc.NodePath and pc2.NodePath <= pc.NodePath || 'a') as ExhibitorCount
+from [ProductCategory] pc
+where pc.ParentId is null
+order by lower(pc.Name)
+limit @selectNumberOfRecords offset @skipNumberOfRecords
+
+
+
+---- level by @parentId + count of exhibitors
+select pc.Id, pc.UniqueId, pc.Name, pc.ParentId, pc.NodePath, pc.NodeLevel,
+       (select count(distinct epc.ExhibitorId)
+        from ProductCategory pc2
+          join ExhibitorProductCategory epc on pc2.Id = epc.ProductCategoryId
+        where pc2.NodePath >= pc.NodePath and pc2.NodePath <= pc.NodePath || 'a') as ExhibitorCount
+from [ProductCategory] pc
+where pc.ParentId = @parentId
+order by lower(pc.Name)
+limit @selectNumberOfRecords offset @skipNumberOfRecords
+
+
+
+---- full list without tree + count of products
+select pc.Id, pc.UniqueId, pc.Name, pc.ParentId, pc.NodePath, pc.NodeLevel,
+       (select count(distinct p.Id)
+        from ProductCategory pc2
+          join Product p on pc2.Id = p.ProductCategoryId
+        where pc2.NodePath >= pc.NodePath and pc2.NodePath <= pc.NodePath || 'a') as ProductCount
+from [ProductCategory] pc
+order by lower(Name)
+limit @selectNumberOfRecords offset @skipNumberOfRecords
+
+
+
+---- top level + count of products
+select pc.Id, pc.UniqueId, pc.Name, pc.ParentId, pc.NodePath, pc.NodeLevel,
+       (select count(distinct p.Id)
+        from ProductCategory pc2
+          join Product p on pc2.Id = p.ProductCategoryId
+        where pc2.NodePath >= pc.NodePath and pc2.NodePath <= pc.NodePath || 'a') as ProductCount
+from [ProductCategory] pc
+where pc.ParentId is null
+order by lower(pc.Name)
+limit @selectNumberOfRecords offset @skipNumberOfRecords
+
+
+---- level by @parentId + count of products
+select pc.Id, pc.UniqueId, pc.Name, pc.ParentId, pc.NodePath, pc.NodeLevel,
+       (select count(distinct p.Id)
+        from ProductCategory pc2
+          join Product p on pc2.Id = p.ProductCategoryId
+        where pc2.NodePath >= pc.NodePath and pc2.NodePath <= pc.NodePath || 'a') as ProductCount
+from [ProductCategory] pc
+where pc.ParentId = @parentId
+order by lower(pc.Name)
+limit @selectNumberOfRecords offset @skipNumberOfRecords
+
+
+
+
+---- product category by ExhibitorId
+select distinct pc.Id, pc.UniqueId, pc.Name
+from ExhibitorProductCategory epc
+  join ProductCategory pc on pc.Id = epc.ProductCategoryId
+where epc.ExhibitorId = @exhibitorId
+order by lower(Name)
+

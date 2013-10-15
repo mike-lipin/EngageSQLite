@@ -1,3 +1,0 @@
-select fm.Id, fm.UniqueId, fm.BuildingDescription, fm.IsDynamic, fm.FilePath
-from FloorMap fm
-order by lower(fm.BuildingDescription)

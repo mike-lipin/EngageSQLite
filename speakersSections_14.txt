@@ -1,5 +1,0 @@
-select FirstAlpha, count(*) as CountInSection
-from [Participant]
-where RegistrationTypeCode = 'Speaker'
-group by FirstAlpha
-order by FirstAlpha

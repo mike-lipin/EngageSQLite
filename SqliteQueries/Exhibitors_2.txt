@@ -1,0 +1,79 @@
+select o.Id, o.UniqueId, o.CompanyName, o.Phone, o.Fax, o.WebsiteUrl , 
+       o.FacilityName, o.Address1, o.Address2, o.CityName, o.StateName, o.PostalCode, o.CountryName, 
+       o.Description, o.FacebookUrl, o.TwitterHashTag, o.LogoImageUrl , 
+       exh.FeaturedExhibitor as FeaturedExhibitor, exh.Rating, 
+       (select 1 from private.Rate r where r.RatedUniqueId = o.UniqueId) as IsRated, 
+       (select 1 from private.Favorite f where f.FavoritedUniqueId = o.UniqueId) as IsFavorite, 
+       exh.BoothNumbers
+from Exhibitor o 
+  join (select e.Id, e.Featured as FeaturedExhibitor, es.BoothNumbers, e.NameSortId
+               ifnull((select r.Value from Rating r where r.UniqueId = e.UniqueId), 0) as Rating
+        from ExhibitorSort e 
+          join ExhibitorSearch es on es.Id = e.Id
+        order by e.Featured desc, e.NameSortId
+        limit @selectNumberOfRecords offset @skipNumberOfRecords) exh on exh.Id = o.Id
+order by FeaturedExhibitor desc, exh.NameSortId
+
+
+
+---- for filtering by some ProductCategories: ----
+
+select o.Id, o.UniqueId, o.CompanyName, o.Phone, o.Fax, o.WebsiteUrl , 
+       o.FacilityName, o.Address1, o.Address2, o.CityName, o.StateName, o.PostalCode, o.CountryName, 
+       o.Description, o.FacebookUrl, o.TwitterHashTag, o.LogoImageUrl , 
+       exh.FeaturedExhibitor as FeaturedExhibitor, exh.Rating, 
+       (select 1 from private.Rate r where r.RatedUniqueId = o.UniqueId) as IsRated, 
+       (select 1 from private.Favorite f where f.FavoritedUniqueId = o.UniqueId) as IsFavorite, 
+       exh.BoothNumbers
+from Exhibitor o 
+  join (select e.Id, e.Featured as FeaturedExhibitor, es.BoothNumbers, e.NameSortId
+               ifnull((select r.Value from Rating r where r.UniqueId = e.UniqueId), 0) as Rating
+        from ExhibitorSort e 
+          join ExhibitorSearch es on es.Id = e.Id
+        where exists(select 1 from ExhibitorProductCategory p where p.ExhibitorId = e.Id and p.ProductCategoryId in (idsstring))
+        order by e.Featured desc, e.NameSortId
+        limit @selectNumberOfRecords offset @skipNumberOfRecords) exh on exh.Id = o.Id
+order by FeaturedExhibitor desc, exh.NameSortId
+
+
+---- idsstring - is a string with comma separated Id values: 11,45,34563,234 ----
+---- for select idsstring of all sub categories use:
+select group_concat(pc.Id)
+from ProductCategory pc 
+where pc.NodePath >= @nodePath and pc.NodePath <= @nodePath || 'a'
+
+
+---- for filtering by some ProductCategory: ----
+select o.Id, o.UniqueId, o.CompanyName, o.Phone, o.Fax, o.WebsiteUrl , 
+       o.FacilityName, o.Address1, o.Address2, o.CityName, o.StateName, o.PostalCode, o.CountryName, 
+       o.Description, o.FacebookUrl, o.TwitterHashTag, o.LogoImageUrl , 
+       exh.FeaturedExhibitor as FeaturedExhibitor, exh.Rating, 
+       (select 1 from private.Rate r where r.RatedUniqueId = o.UniqueId) as IsRated, 
+       (select 1 from private.Favorite f where f.FavoritedUniqueId = o.UniqueId) as IsFavorite, 
+       exh.BoothNumbers
+from Exhibitor o 
+  join (select e.Id, e.Featured as FeaturedExhibitor, es.BoothNumbers, e.NameSortId,
+               ifnull((select r.Value from Rating r where r.UniqueId = e.UniqueId), 0) as Rating
+        from ExhibitorSort e 
+          join ExhibitorSearch es on es.Id = e.Id
+        where exists(select 1 
+                     from ProductCategory pc 
+                       join ExhibitorProductCategory epc on epc.ProductCategoryId = pc.Id
+                     where epc.ExhibitorId = e.Id and pc.NodePath >= @nodePath and pc.NodePath <= @nodePath || ' ')
+        order by e.Featured desc, e.NameSortId
+        limit @selectNumberOfRecords offset @skipNumberOfRecords) exh on exh.Id = o.Id
+order by FeaturedExhibitor desc, exh.NameSortId
+---- @nodePath - value of NodePath field for needed ProductCategory
+
+
+
+---- for order by rating, change order by clauses to:
+        order by e.Featured desc, Rating, e.NameSortId
+        limit @selectNumberOfRecords offset @skipNumberOfRecords) exh on exh.Id = o.Id
+order by FeaturedExhibitor desc, exh.Rating, exh.NameSortId
+
+
+---- for order by BoothNumbers, change order by clauses to:
+        order by e.Featured desc, es.BoothNumbers, e.NameSortId
+        limit @selectNumberOfRecords offset @skipNumberOfRecords) exh on exh.Id = o.Id
+order by FeaturedExhibitor desc, exh.BoothNumbers, exh.NameSortId

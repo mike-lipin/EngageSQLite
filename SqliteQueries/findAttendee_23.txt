@@ -1,0 +1,23 @@
+---- list of speakers ----
+select p.Id, p.RegistrationTypeCode, p.UniqueId, p.FirstName, p.LastName
+     , p.Email, p.Phone, p.CompanyName, p.BusinessTitle, p.ImageUrl
+     , p.SocialBio, p.TwitterUrl, p.FacebookUrl, p.LinkedInUrl, p.FirstAlpha
+     , p.Location
+from ParticipantSearch ps
+    join [Participant] p on p.Id = ps.Id and p.RegistrationTypeCode = 'Attendee'
+where ps.RegistrationTypeCode = 'Attendee' and ParticipantSearch match 'keyword otherkeyword anotherkeyword'
+order by p.FirstAlpha, lower(p.FirstName), lower(p.LastName)
+limit @selectNumberOfRecords offset @skipNumberOfRecords
+
+---- just replace 'keyword otherkeyword anotherkeyword' with your search string ----
+
+
+---- list of sections ----
+select p.FirstAlpha, count(*)
+from ParticipantSearch ps
+    join [Participant] p on p.Id = ps.Id and p.RegistrationTypeCode = 'Attendee'
+where ps.RegistrationTypeCode = 'Attendee' and ParticipantSearch match 'keyword otherkeyword anotherkeyword'
+group by p.FirstAlpha
+order by p.FirstAlpha
+
+---- just replace 'keyword otherkeyword anotherkeyword' with your search string ----

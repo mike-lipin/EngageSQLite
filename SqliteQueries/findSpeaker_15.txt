@@ -1,0 +1,41 @@
+---- list of speakers ----
+select p.Id, p.RegistrationTypeCode, p.UniqueId, p.FirstName, p.LastName
+     , p.Email, p.Phone, p.CompanyName, p.BusinessTitle, p.ImageUrl
+     , p.SocialBio, p.TwitterUrl, p.FacebookUrl, p.LinkedInUrl, p.FirstAlpha
+     , p.Location
+     , (select 1 from private.Rate r where r.RatedUniqueId = p.UniqueId and ifnull(r.Status, '') <> 'deleted') as IsRated
+     , (select 1 from private.Favorite f where f.FavoritedUniqueId = p.UniqueId and ifnull(f.Status, '') <> 'deleted') as IsFavorite
+from ParticipantSearch ps
+    join [Participant] p on p.Id = ps.Id and p.RegistrationTypeCode = 'Speaker'
+where ps.RegistrationTypeCode = 'Speaker' and ParticipantSearch match 'keyword otherkeyword anotherkeyword'
+order by p.FirstAlpha, lower(p.FirstName), lower(p.LastName)
+limit @selectNumberOfRecords offset @skipNumberOfRecords
+
+---- just replace 'keyword otherkeyword anotherkeyword' with your search string ----
+
+
+---- list of sections ----
+select p.FirstAlpha, count(*)
+from ParticipantSearch ps
+    join [Participant] p on p.Id = ps.Id and p.RegistrationTypeCode = 'Speaker'
+where ps.RegistrationTypeCode = 'Speaker' and ParticipantSearch match 'keyword otherkeyword anotherkeyword'
+group by p.FirstAlpha
+order by p.FirstAlpha
+
+---- just replace 'keyword otherkeyword anotherkeyword' with your search string ----
+
+
+---- for filtering by different conditions add one or few of condition before "order by" section:
+
+---- for filtering by few Ids add to where clause: ----
+and p.Id in (idsstring)
+
+---- idsstring - is a string with comma separated Id values: 11,45,34563,234 ----
+
+
+---- for filtering by first letter
+and p.FirstAlpha = 'a'
+
+---- for filtering by few first letters
+and p.FirstAlpha in (lettersstring)
+---- lettersstring - is a string with comma separated character values: 'a', 'c', 'y', 'z' ----
