@@ -1,0 +1,14 @@
+---- return min DateFrom and max DateTo from all EventItem
+select substr(min(DateFrom),1,10) RangeStart, substr(max(DateTo),1,10) RangeEnd from EventItem;
+
+
+---- return unique couples ----
+select distinct substr(DateFrom),1,10) RangeStart, substr(DateTo,1,10) RangeEnd from EventItem;
+
+
+
+---- for filtering by EventItemTypeId add to where clause: ----
+SELECT substr(min(DateFrom),1,10) RangeStart, substr(max(DateTo),1,10) RangeEnd
+FROM EventItem ei
+where exists(select 1 from EventItemTypeEventItem ete where ete.EventItemId = ei.Id and ete.EventItemTypeId = @eventItemTypeId)
+---- and fill parameter @eventItemTypeId ----

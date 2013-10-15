@@ -1,0 +1,6 @@
+select Id, UniqueId, Name
+     , (select 1 from private.Rate r where r.RatedUniqueId = t.UniqueId and ifnull(r.Status, '') <> 'deleted') as IsRated
+     , (select 1 from private.Favorite f where f.FavoritedUniqueId = t.UniqueId and ifnull(f.Status, '') <> 'deleted') as IsFavorite
+from [Track] t
+order by lower(Name)
+limit @selectNumberOfRecords offset @skipNumberOfRecords

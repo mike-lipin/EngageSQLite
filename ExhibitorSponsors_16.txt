@@ -1,0 +1,6 @@
+SELECT s.Id, s.SponsorshipLevelId, s.Name, s.SponsorName, s.ImageUrl, s.Description
+     , s.WebsiteUrl, s.YoutubeUrl, s.ExhibitorId
+FROM ExhibitorSponsorship es
+  join Sponsorship s on s.Id = es.SponsorshipId
+where es.ExhibitorId = @exhibitorId
+limit @selectNumberOfRecords offset @skipNumberOfRecords

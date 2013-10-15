@@ -1,0 +1,8 @@
+select Id, UniqueId, ExhibitorId, ProductCategoryId, QRCode, Name
+     , Description, ImageUrl
+     , (select 1 from private.Rate r where r.RatedUniqueId = p.UniqueId and ifnull(r.Status, '') <> 'deleted') as IsRated
+     , (select 1 from private.Favorite f where f.FavoritedUniqueId = p.UniqueId and ifnull(f.Status, '') <> 'deleted') as IsFavorite
+from [Product] p
+where ExhibitorId = @exhibitorId
+order by lower(Name)
+limit @selectNumberOfRecords offset @skipNumberOfRecords

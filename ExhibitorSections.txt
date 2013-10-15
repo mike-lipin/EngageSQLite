@@ -1,0 +1,5 @@
+select e.Section, count(*)
+from ExhibitorSort e 
+  join ExhibitorSearch es on es.Id = e.Id
+group by e.Section
+order by e.Section

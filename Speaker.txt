@@ -1,0 +1,52 @@
+---- not include FirstAlpha ----
+select Id, RegistrationTypeCode, UniqueId, FirstName, LastName
+     , Email, Phone, CompanyName, BusinessTitle, ImageUrl
+     , SocialBio, TwitterUrl, FacebookUrl, LinkedInUrl
+     , Location
+from [Participant]
+where RegistrationTypeCode = 'Speaker'
+order by lower(FirstName), lower(LastName)
+limit @selectNumberOfRecords offset @skipNumberOfRecords
+
+
+
+---- order by FirstAlpha ----
+select Id, RegistrationTypeCode, UniqueId, FirstName, LastName
+     , Email, Phone, CompanyName, BusinessTitle, ImageUrl
+     , SocialBio, TwitterUrl, FacebookUrl, LinkedInUrl, FirstAlpha
+     , Location
+from [Participant]
+where RegistrationTypeCode = 'Speaker'
+order by FirstAlpha, lower(FirstName), lower(LastName)
+limit @selectNumberOfRecords offset @skipNumberOfRecords
+
+
+
+---- Speackers by session ----
+select p.Id, p.RegistrationTypeCode, p.UniqueId, p.FirstName, p.LastName
+     , p.Email, p.Phone, p.CompanyName, p.BusinessTitle, p.ImageUrl
+     , p.SocialBio, p.TwitterUrl, p.FacebookUrl, p.LinkedInUrl, p.FirstAlpha
+     , p.Location
+from EventItemParticipant eip
+    join Participant p on p.Id = eip.ParticipantId
+where eip.EventItemId = @eventItemId
+order by p.FirstAlpha, lower(p.FirstName), lower(p.LastName)
+
+
+
+---- Speackers for filter ----
+select p.Id, p.FirstName, p.LastName, count(distinct eip.EventItemId)
+from EventItemParticipant eip
+    join Participant p on p.Id = eip.ParticipantId
+group by p.Id, p.FirstName, p.LastName
+order by p.FirstAlpha, lower(p.FirstName), lower(p.LastName)
+
+
+---- Speackers for filter by EventItemTypeId ----
+select p.Id, p.FirstName, p.LastName, count(distinct eip.EventItemId)
+from EventItemTypeEventItem eti
+    join EventItemParticipant eip on eti.EventItemId = eip.EventItemId
+    join Participant p on p.Id = eip.ParticipantId
+where eti.EventItemTypeId = @eventItemTypeId
+group by p.Id, p.FirstName, p.LastName
+order by p.FirstAlpha, lower(p.FirstName), lower(p.LastName)

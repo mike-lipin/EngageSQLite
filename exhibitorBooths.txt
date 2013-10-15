@@ -1,0 +1,3 @@
+select b.Id, b.UniqueId, b.FloorMapId, b.Number, b.Description, b.Area
+from Booth b 
+where b.ExhibitorId = @exhibitorId

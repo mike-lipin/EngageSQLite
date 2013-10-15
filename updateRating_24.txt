@@ -1,0 +1,38 @@
+---- like some entity by entityType and entityUniqueId
+insert into private.Rate (UniqueId, EntityType, RatedUniqueId, Status)
+values (@uniqueId, @entityType, @entityUniqueId, 'inserted')
+
+---- SQLite doesn't support GUID generation, so you must generate new GUID and fill @uniqueId parameter
+
+
+
+---- unlike some entity by entityType and entityUniqueId
+update private.Rate
+set Status = 'deleted'
+where EntityType = @entityType and RatedUniqueId = @entityUniqueId
+
+
+
+---- select records to insert on server
+select UniqueId, 'rate' as TypeName, EntityType as EntityTypeName, RatedUniqueId as EntityUniqueId
+from private.Rate
+where Status = 'inserted'
+
+---- select records to remove from server
+select UniqueId
+from private.Rate
+where Status = 'deleted'
+
+
+
+---- When you recieve new data from Private data service use for insert new data
+insert or replace into private.Rate (UniqueId, EntityType, RatedUniqueId, Status)
+values (@uniqueId, @entityType, @entityUniqueId, '')
+
+
+---- to remove "deleted" records from local table, then it successfully removed from server, use:
+delete from private.Rate where Status = 'deleted' and UniqueId = @uniqueId
+
+---- @uniqueId - it the value of UniqueId record, that you remove from server
+---- If you sure, that all records succsefully removed from server, you can use:
+delete from private.Rate where Status = 'deleted'

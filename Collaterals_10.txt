@@ -1,0 +1,5 @@
+select Id, UniqueId, ExhibitorId, TypeName, CollateralUrl, Name, FileSize
+from [Collateral]
+where ExhibitorId = @exhibitorId
+order by Id
+limit @selectNumberOfRecords offset @skipNumberOfRecords

@@ -1,0 +1,20 @@
+---- unreadCalendarItemsCount ----
+
+select count(*)
+from
+(
+  select 1
+  from private.Appointment a
+    left join private.Profile cp on 1=1
+  where a.IsRead is null or a.IsRead = 0
+	and (not(ifnull(a.ParentUniqueId,'') <> '' and a.SenderUniqueId = cp.UniqueId)) and ((SubType not in (4,0)) and ((IsRead is null or IsRead = 0)))
+    and (a.SenderUniqueId = cp.UniqueId or a.ReceiverUniqueId = cp.UniqueId or a.ReceiverUniqueId is null)
+  union all
+  select 1
+  from private.ScheduledItem si
+  where si.IsRead is null or si.IsRead = 0
+  union all
+  select 1 
+  from private.PushNotificationHistory pnh
+  where pnh.IsRead is null or pnh.IsRead = 0
+)

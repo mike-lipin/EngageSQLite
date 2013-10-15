@@ -1,0 +1,21 @@
+select UniqueId, EntityUniqueId, EntityType, Title
+     , FileName, FileSize, AccessDate, Status, IsRead
+from private.Document
+order by AccessDate desc
+limit @selectNumberOfRecords offset @skipNumberOfRecords
+
+
+
+---- if EntityType = Collateral, then URL:
+select CollateralUrl from Collateral where UniqueId = @documentUniqueId
+
+---- if EntityType = Handout, then URL:
+select Url from Handout where UniqueId = @documentUniqueId
+
+
+
+---- document by type and UnqiueId
+select UniqueId, EntityUniqueId, EntityType, Title
+     , FileName, FileSize, AccessDate, Status, IsRead
+from private.Document
+where EntityUniqueId = @entityUniqueId and EntityType = @entityType
