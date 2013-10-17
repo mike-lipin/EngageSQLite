@@ -1,3 +1,11 @@
 select fm.Id, fm.UniqueId, fm.BuildingDescription, fm.IsDynamic, fm.FilePath
 from FloorMap fm
 order by lower(fm.BuildingDescription)
+
+
+select fm.Id, fm.UniqueId, fm.BuildingDescription, fm.IsDynamic, fm.FilePath, 
+  (select count(*) from FullFloorMapExhibitor f where f.FloorMapId = fm.Id) as ExhibitorsCount
+from FloorMap fm
+order by lower(fm.BuildingDescription)
+
+

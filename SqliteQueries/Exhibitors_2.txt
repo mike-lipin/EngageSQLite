@@ -66,6 +66,12 @@ order by FeaturedExhibitor desc, exh.NameSortId
 ---- @nodePath - value of NodePath field for needed ProductCategory
 
 
+---- for filtering by FloorMapId : ----
+exists(select 1 from FullFloorMapExhibitor f where f.ExhibitorId = e.Id and f.FloorMapId = @floorMapId)
+
+---- for filtering by BoothId : ----
+exists(select 1 from ExhibitorBooth eb where eb.ExhibitorId = e.Id and eb.BoothId = @boothId)
+
 
 ---- for order by rating, change order by clauses to:
         order by e.Featured desc, Rating, e.NameSortId
@@ -77,3 +83,4 @@ order by FeaturedExhibitor desc, exh.Rating, exh.NameSortId
         order by e.Featured desc, es.BoothNumbers, e.NameSortId
         limit @selectNumberOfRecords offset @skipNumberOfRecords) exh on exh.Id = o.Id
 order by FeaturedExhibitor desc, exh.BoothNumbers, exh.NameSortId
+

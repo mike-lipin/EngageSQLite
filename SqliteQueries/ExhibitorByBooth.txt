@@ -6,8 +6,8 @@ select o.Id, o.UniqueId, o.CompanyName, o.Phone, o.Fax, o.WebsiteUrl ,
        (select 1 from private.Rate r where r.RatedUniqueId = o.UniqueId) as IsRated, 
        (select 1 from private.Favorite f where f.FavoritedUniqueId = UniqueId) as IsFavorite, 
        es.BoothNumbers
-from Booth b
-  join Exhibitor o on o.Id = b.ExhibitorId
+from ExhibitorBooth eb
+  join Exhibitor o on o.Id = eb.ExhibitorId
   join ExhibitorSearch es on es.Id = e.Id
   join ExhibitorSort e on e.Id = o.Id
-where b.Id = @boothId
+where eb.BoothId = @boothId
