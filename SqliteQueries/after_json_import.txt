@@ -103,3 +103,8 @@
     select bc.FloorMapId, eb.ExhibitorId
     from ExhibitorBooth eb
       join BoothCoordinate bc on eb.BoothId = bc.BoothId
+    union
+    select b.FloorMapId, eb.ExhibitorId
+    from ExhibitorBooth eb
+      join Booth b on b.Id = eb.BoothId
+      where b.FloorMapId is not null
