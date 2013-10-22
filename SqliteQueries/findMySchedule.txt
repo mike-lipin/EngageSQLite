@@ -1,5 +1,5 @@
 ---- very big query with union all and order by at the end ----
-select 'EventItem' as Type, ei.UniqueId, ei.Location, ei.DateFrom, ei.Title
+select 'EventItem' as Type, ei.UniqueId, ei.Location, tt.DateFrom, ei.Title
      , es.Speakers as Participants, ei.ImageUrl
      , ifnull((select 1 from EventItemSponsorship where EventItemId = ei.Id), 0) as IsFeatured
      , ifnull((select r.Value from Rating r where r.UniqueId = ei.UniqueId), 0) as Rating
@@ -8,7 +8,8 @@ select 'EventItem' as Type, ei.UniqueId, ei.Location, ei.DateFrom, ei.Title
 from private.ScheduledItem si
   join EventItem ei on ei.UniqueId = si.ItemUniqueId
   join EventItemSearch es on es.Id = ei.Id
-where EventItemSearch match 'keyword otherkeyword anotherkeyword' and substr(ei.DateTo, 1, 10) >= @dateFrom and substr(ei.DateTo, 1, 10) <= @dateTo
+  join EventItemTimeTable tt on tt.EventItemId = ei.Id
+where EventItemSearch match 'keyword otherkeyword anotherkeyword' and substr(tt.DateTo, 1, 10) >= @dateFrom and substr(tt.DateTo, 1, 10) <= @dateTo
 
 
 union all

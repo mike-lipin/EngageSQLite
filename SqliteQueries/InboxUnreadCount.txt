@@ -11,8 +11,9 @@ from
     and (a.SenderUniqueId = cp.UniqueId or a.ReceiverUniqueId = cp.UniqueId or a.ReceiverUniqueId is null)
   union all
   select 1
-  from private.ScheduledItem si
+  from private.ScheduledItem si  
   where si.IsRead is null or si.IsRead = 0
+  group by ItemUniqueId
   union all
   select 1 
   from private.PushNotificationHistory pnh
