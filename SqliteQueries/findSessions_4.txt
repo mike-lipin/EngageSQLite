@@ -1,7 +1,7 @@
 ---- new version with FTS search ----
 SELECT ei.Id, ei.UniqueId, ei.Title as Name, ei.Title, ei.Description as Topic, ei.Description
      , tt.DateFrom, tt.DateTo, ei.IsOpen, ei.IsRateConfigured, ei.FacebookUrl, ei.TwitterHashTag
-     , ei.IsHidden, eif.Speakers, ei.Location, ei.ImageUrl, eif.IsPoster
+     , ei.IsHidden, eif.Speakers, ei.Location, ei.ImageUrl, eif.IsPoster, ei.IsCheckinRequired
      , eif.FeaturedEventItem
      , (select r.Value from Rating r where r.UniqueId = ei.UniqueId) as Rating
      , (select 1 from private.Rate r where r.RatedUniqueId = ei.UniqueId and ifnull(r.Status, '') <> 'deleted') as IsRated

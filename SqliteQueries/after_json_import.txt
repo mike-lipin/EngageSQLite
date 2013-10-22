@@ -1,5 +1,11 @@
 ---- after import delta from json you must execute folowing queries in that order ----
 
+    update Booth
+    set FloorMapIds = ifnull((select trim(group_concat(distinct ' ' || bc.FloorMapId)) 
+                              from BoothCoordinate bc 
+                              where bc.BoothId = Booth.Id 
+                              order by bc.FloorMapId), FloorMapId)
+
     delete from EventItemSearch
 
     delete from ExhibitorSearch
@@ -13,7 +19,7 @@
        where eip.EventItemId = ei.Id)
     from [EventItem] ei
 
-    insert into ExhibitorSearch (Id, SearchText, BoothNumbers, FloorMapIds)
+    insert into ExhibitorSearch (Id, SearchText, BoothNumbers)
     select e.Id, ifnull(e.CompanyName, '') || ' ' ||
       ifnull(e.FacilityName, '') || ' ' || ifnull(e.Address1, '') || ' ' || ifnull(e.Address2, '') || ' ' || ifnull(e.CityName, '') 
         || ' ' || ifnull(e.StateName, '') || ' ' || ifnull(e.PostalCode, '') || ' ' || ifnull(e.CountryName, '') || ' ' ||
@@ -22,11 +28,9 @@
        from Product p 
        where p.ExhibitorId = e.Id), ''),
       (select group_concat(b.Number, ', ')
-       from Booth b
-       where b.ExhibitorId = e.Id) as BoothNumbers,
-      (select trim(group_concat(distinct ' ' || b.FloorMapIds))
-       from Booth b
-       where b.ExhibitorId = e.Id) as FloorMapIds
+       from ExhibitorBooth eb
+          join Booth b on b.Id = eb.BoothId
+       where eb.ExhibitorId = e.Id) as BoothNumbers
     from Exhibitor e
 
     insert into ParticipantSearch (Id, SearchText, RegistrationTypeCode)
@@ -83,8 +87,24 @@
                      where pb.ProductId = p.Id
                      order by b.Number), 
                   (select trim(group_concat(' ' || b.Number))
-                     from Booth b
-                     where b.ExhibitorId = e.Id
+                     from ExhibitorBooth eb
+                       join Booth b on b.Id = eb.BoothId
+                     where eb.ExhibitorId = e.Id
                      order by b.Number)))
     from [Product] p
       join [Exhibitor] e on e.Id = p.ExhibitorId
+
+	delete from FullFloorMapExhibitor
+	
+    insert or replace into FullFloorMapExhibitor (FloorMapId, ExhibitorId)
+    select FloorMapId, ExhibitorId
+    from FloorMapExhibitor
+    union
+    select bc.FloorMapId, eb.ExhibitorId
+    from ExhibitorBooth eb
+      join BoothCoordinate bc on eb.BoothId = bc.BoothId
+    union
+    select b.FloorMapId, eb.ExhibitorId
+    from ExhibitorBooth eb
+      join Booth b on b.Id = eb.BoothId
+      where b.FloorMapId is not null

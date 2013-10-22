@@ -2,3 +2,7 @@ select t.Id, t.Name
 from EventItemTypeEventItem e
   join EventItemType t on t.Id = e.EventItemTypeId
 where e.EventItemId = @eventItemId
+
+
+select t.Id, t.Name, (select count(*) from EventItemTypeEventItem e where e.EventItemTypeId = t.Id) as EventItemsCount
+from EventItemType t

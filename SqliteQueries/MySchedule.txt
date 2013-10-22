@@ -8,7 +8,7 @@ select 'EventItem' as Type, ei.UniqueId, ei.Location, tt.DateFrom, ei.Title
 from private.ScheduledItem si
   join EventItem ei on ei.UniqueId = si.ItemUniqueId
   join EventItemSearch es on es.Id = ei.Id
-  join EventItemTimeTable tt on tt.EventItemId = ei.Id
+  join EventItemTimeTable tt on tt.EventItemId = ei.Id and ifnull(si.EventItemTimeId, tt.Id) = tt.Id
 where substr(tt.DateFrom, 1, 10) = @date
 
 union all
@@ -44,4 +44,6 @@ from private.ScheduledItem si
 union
 select distinct substr(a.DateFrom, 1, 10) as DateFrom
 from private.Appointment a
+  left join private.Profile cp on 1=1
+where (a.SenderUniqueId = cp.UniqueId or a.ReceiverUniqueId = cp.UniqueId or a.ReceiverUniqueId is null)
 order by DateFrom

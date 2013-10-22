@@ -6,8 +6,43 @@ select o.Id, o.UniqueId, o.CompanyName, o.Phone, o.Fax, o.WebsiteUrl ,
        (select 1 from private.Rate r where r.RatedUniqueId = o.UniqueId) as IsRated, 
        (select 1 from private.Favorite f where f.FavoritedUniqueId = UniqueId) as IsFavorite, 
        es.BoothNumbers
+from ExhibitorBooth eb
+  join Exhibitor o on o.Id = eb.ExhibitorId
+  join ExhibitorSearch es on es.Id = eb.ExhibitorId
+  join ExhibitorSort e on e.Id = eb.ExhibitorId
+where eb.BoothId = @boothId
+
+
+
+select o.Id, o.UniqueId, o.CompanyName, o.Phone, o.Fax, o.WebsiteUrl , 
+       o.FacilityName, o.Address1, o.Address2, o.CityName, o.StateName, o.PostalCode, o.CountryName, 
+       o.Description, o.FacebookUrl, o.TwitterHashTag, o.LogoImageUrl , 
+       e.Featured as FeaturedExhibitor,              
+       (select r.Value from Rating r where r.UniqueId = o.UniqueId) as Rating, 
+       (select 1 from private.Rate r where r.RatedUniqueId = o.UniqueId) as IsRated, 
+       (select 1 from private.Favorite f where f.FavoritedUniqueId = UniqueId) as IsFavorite, 
+       es.BoothNumbers
+from ExhibitorBooth eb
+  join FullFloorMapExhibitor fe on fe.ExhibitorId = eb.ExhibitorId
+  join Exhibitor o on o.Id = eb.ExhibitorId
+  join ExhibitorSearch es on es.Id = eb.ExhibitorId
+  join ExhibitorSort e on e.Id = eb.ExhibitorId
+where eb.BoothId = @boothId and fe.FloorMapId = @floorMapId
+
+
+
+select o.Id, o.UniqueId, o.CompanyName, o.Phone, o.Fax, o.WebsiteUrl , 
+       o.FacilityName, o.Address1, o.Address2, o.CityName, o.StateName, o.PostalCode, o.CountryName, 
+       o.Description, o.FacebookUrl, o.TwitterHashTag, o.LogoImageUrl , 
+       e.Featured as FeaturedExhibitor,              
+       (select r.Value from Rating r where r.UniqueId = o.UniqueId) as Rating, 
+       (select 1 from private.Rate r where r.RatedUniqueId = o.UniqueId) as IsRated, 
+       (select 1 from private.Favorite f where f.FavoritedUniqueId = UniqueId) as IsFavorite, 
+       es.BoothNumbers
 from Booth b
-  join Exhibitor o on o.Id = b.ExhibitorId
-  join ExhibitorSearch es on es.Id = e.Id
-  join ExhibitorSort e on e.Id = o.Id
-where b.Id = @boothId
+  join ExhibitorBooth eb on eb.BoothId = b.Id
+  join FullFloorMapExhibitor fe on fe.ExhibitorId = eb.ExhibitorId
+  join Exhibitor o on o.Id = eb.ExhibitorId
+  join ExhibitorSearch es on es.Id = eb.ExhibitorId
+  join ExhibitorSort e on e.Id = eb.ExhibitorId
+where b.Number = @boothNumber and fe.FloorMapId = @floorMapId

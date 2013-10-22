@@ -40,3 +40,9 @@ order by FeaturedExhibitor desc, exh.NameSortId
 
 ---- just replace 'keyword otherkeyword anotherkeyword' with your search string ----
 ---- idsstring - is a string with comma separated Id values: 11,45,34563,234 ----
+
+---- for filtering by FloorMapId : ----
+exists(select 1 from FullFloorMapExhibitor f where f.ExhibitorId = e.Id and f.FloorMapId = @floorMapId)
+
+---- for filtering by BoothId : ----
+exists(select 1 from ExhibitorBooth eb where eb.ExhibitorId = e.Id and eb.BoothId = @boothId)
