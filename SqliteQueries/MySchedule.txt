@@ -5,9 +5,11 @@ select 'EventItem' as Type, ei.UniqueId, ei.Location, tt.DateFrom, ei.Title
      , ifnull((select r.Value from Rating r where r.UniqueId = ei.UniqueId), 0) as Rating
      , ifnull((select 1 from private.Rate r where r.RatedUniqueId = ei.UniqueId and ifnull(r.Status, '') <> 'deleted'), 0) as IsRated
      , ifnull((select 1 from private.Favorite f where f.FavoritedUniqueId = ei.UniqueId and ifnull(f.Status, '') <> 'deleted'), 0) as IsFavorite
+     , eis.SectionDate, eis.SectionHour
 from private.ScheduledItem si
   join EventItem ei on ei.UniqueId = si.ItemUniqueId
   join EventItemSearch es on es.Id = ei.Id
+  join EventItemSort eis on eis.Id = ei.Id
   join EventItemTimeTable tt on tt.EventItemId = ei.Id and ifnull(si.EventItemTimeId, tt.Id) = tt.Id
 where substr(tt.DateFrom, 1, 10) = @date
 
@@ -25,12 +27,13 @@ select 'Appointment' as Type, a.UniqueId, a.Location, a.DateFrom, a.Summary as T
          else a.SenderLogoUrl
        end as ImageUrl
      , 0 as IsFeatured, 0 as Rating, 0 as IsRated, 0 as IsFavorite
+     , substr(a.DateFrom, 1, 10) as SectionDate, substr(a.DateFrom, 12, 5) as SectionHour
 from private.Appointment a
   left join private.Profile cp on 1=1
 where substr(a.DateFrom, 1, 10) = @date
   and (a.SenderUniqueId = cp.UniqueId or a.ReceiverUniqueId = cp.UniqueId or a.ReceiverUniqueId is null)
 
-order by DateFrom, Title
+order by SectionDate, SectionHour, DateFrom, Title
 
 ---- @date - must be in format 'yyyy-mm-dd'
 
