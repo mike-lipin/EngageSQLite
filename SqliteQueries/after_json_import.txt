@@ -55,7 +55,10 @@
     insert into EventItemSort (Id, DateFrom, DateTo, HourFrom, SectionDate, SectionHour, Featured, IsHidden, FirstAlpha, TimeId, IsPoster)
     select ei.Id, substr(tt.DateFrom, 1, 10), substr(tt.DateTo, 1, 10), cast(substr(tt.DateFrom, 12, 2) as int), 
            ifnull((select " Featured" from EventItemSponsorship where EventItemId = ei.Id), substr(tt.DateFrom, 1, 10)),
-           ifnull((select -1 from EventItemSponsorship where EventItemId = ei.Id), substr(tt.DateFrom, 12, 5)),
+           ifnull((select -1 from EventItemSponsorship where EventItemId = ei.Id), 
+             case when substr(tt.DateFrom, 12, 5) = "00:00" and substr(tt.DateTo, 12, 5) = "23:59" then " FullDay"
+               else substr(tt.DateFrom, 12, 5)
+             end),
            ifnull((select 1 from EventItemSponsorship where EventItemId = ei.Id), 0),
            ei.IsHidden, substr(lower(ei.Title), 1, 1), tt.Id, ei.IsPoster
     from 
