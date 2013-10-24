@@ -1,13 +1,13 @@
-SELECT UniqueId, Status, ModifiedDate, Name, CompanyName, BusinessTitle
+SELECT UniqueId, Status, ModifiedDate, FirstName, LastName, CompanyName, BusinessTitle
      , Phone, Email, WebSite, Note, Address
 FROM private.[Contact]
-order by lower(Name)
+order by lower(FirstName), lower(LastName)
 limit @selectNumberOfRecords offset @skipNumberOfRecords
 
 
 
 ---- sections ----
-select lower(substr(Name, 1, 1)) as FirstAlpha, count(*) as CountInSection
+select lower(substr(FirstName, 1, 1)) as FirstAlpha, count(*) as CountInSection
 from private.[Contact]
 group by FirstAlpha
 order by FirstAlpha
@@ -17,11 +17,11 @@ order by FirstAlpha
 
 ---- find contact by name ----
 
-SELECT UniqueId, Status, ModifiedDate, Name, CompanyName, BusinessTitle
+SELECT UniqueId, Status, ModifiedDate, FirstName, LastName, CompanyName, BusinessTitle
      , Phone, Email, WebSite, Note, Address
 FROM private.[Contact]
-where lower(Name) like '%findstr%'
-order by lower(Name)
+where lower(FirstName || ' ' || LastName) like '%findstr%' or lower(LastName || ' ' || FirstName) like '%findstr%'
+order by lower(FirstName), lower(LastName)
 limit @selectNumberOfRecords offset @skipNumberOfRecords
 
 ---- replace findstr by your keyword in lowercase, but % must be here. for example, if you search "joe" you must place: lower(Name) like '%joe%'
