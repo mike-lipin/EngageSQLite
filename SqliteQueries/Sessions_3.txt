@@ -6,14 +6,14 @@ SELECT ei.Id, ei.UniqueId, ei.Title as Name, ei.Title, ei.Description as Topic, 
      , (select 1 from private.Rate r where r.RatedUniqueId = ei.UniqueId and ifnull(r.Status, '') <> 'deleted') as IsRated
      , (select 1 from private.Favorite f where f.FavoritedUniqueId = ei.UniqueId and ifnull(f.Status, '') <> 'deleted') as IsFavorite
 from EventItem ei
-  join (select e.Id, e.DateFrom, e.HourFrom, e.Featured as FeaturedEventItem, es.Speakers, e.NameSortId, e.TimeId, e.IsPoster
+  join (select e.Id, e.SectionDate, e.SectionHour, e.Featured as FeaturedEventItem, es.Speakers, e.NameSortId, e.TimeId, e.IsPoster
         from EventItemSort e 
           join EventItemSearch es on es.Id = e.Id
         where e.IsHidden = 0
-        order by e.Featured desc, e.DateFrom, e.HourFrom, e.NameSortId
+        order by e.Featured desc, e.SectionDate, e.SectionHour, e.NameSortId
         limit @selectNumberOfRecords offset @skipNumberOfRecords) eif on eif.Id = ei.Id
   join EventItemTimeTable tt on tt.Id = eif.TimeId
-order by eif.FeaturedEventItem desc, eif.DateFrom, eif.HourFrom, eif.NameSortId
+order by eif.FeaturedEventItem desc, eif.SectionDate, eif.SectionHour, eif.NameSortId
 
 
 ---- select for specified date: ----
@@ -27,14 +27,14 @@ SELECT ei.Id, ei.UniqueId, ei.Title as Name, ei.Title, ei.Description as Topic, 
      , (select 1 from private.Rate r where r.RatedUniqueId = ei.UniqueId and ifnull(r.Status, '') <> 'deleted') as IsRated
      , (select 1 from private.Favorite f where f.FavoritedUniqueId = ei.UniqueId and ifnull(f.Status, '') <> 'deleted') as IsFavorite
 from EventItem ei
-  join (select e.Id, e.DateFrom, e.HourFrom, e.Featured as FeaturedEventItem, es.Speakers, e.NameSortId, e.TimeId, e.IsPoster
+  join (select e.Id, e.SectionDate, e.SectionHour, e.Featured as FeaturedEventItem, es.Speakers, e.NameSortId, e.TimeId, e.IsPoster
         from EventItemSort e 
           join EventItemSearch es on es.Id = e.Id
         where e.DateFrom = @dateOnly and e.IsHidden = 0
-        order by e.Featured desc, e.DateFrom, e.HourFrom, e.NameSortId
+        order by e.Featured desc, e.SectionDate, e.SectionHour, e.NameSortId
         limit @selectNumberOfRecords offset @skipNumberOfRecords) eif on eif.Id = ei.Id
   join EventItemTimeTable tt on tt.Id = eif.TimeId
-order by eif.FeaturedEventItem desc, eif.DateFrom, eif.HourFrom, eif.NameSortId
+order by eif.FeaturedEventItem desc, eif.SectionDate, eif.SectionHour, eif.NameSortId
 
 ---- @dateOnly - must be string in format 'yyyy-mm-dd' ----
 
