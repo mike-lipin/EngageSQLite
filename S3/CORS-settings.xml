@@ -1,0 +1,23 @@
+<!--usefull links:
+http://s3browser.com/
+http://client.cors-api.appspot.com/
+http://stackoverflow.com/questions/12229844/amazon-s3-cors-cross-origin-resource-sharing-and-firefox-cross-domain-font-loa
+https://forums.aws.amazon.com/thread.jspa?threadID=114646
+http://docs.aws.amazon.com/AmazonS3/latest/dev/cors.html-->
+<?xml version="1.0" encoding="utf-8"?>
+<CORSConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+  <CORSRule>
+    <AllowedOrigin>*</AllowedOrigin>
+    <AllowedMethod>GET</AllowedMethod>
+    <AllowedMethod>PUT</AllowedMethod>
+    <AllowedMethod>POST</AllowedMethod>
+    <AllowedMethod>HEAD</AllowedMethod>
+    <MaxAgeSeconds>3000</MaxAgeSeconds>
+    <AllowedHeader>Content-*</AllowedHeader>
+    <AllowedHeader>Access-Control-*</AllowedHeader>
+    <AllowedHeader>Host</AllowedHeader>
+    <ExposeHeader>Access-Control-Allow-Headers</ExposeHeader>
+    <ExposeHeader>Access-Control-Allow-Methods</ExposeHeader>
+    <ExposeHeader>Access-Control-Allow-Origin</ExposeHeader>
+  </CORSRule>
+</CORSConfiguration>
