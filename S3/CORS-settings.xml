@@ -9,15 +9,8 @@ http://docs.aws.amazon.com/AmazonS3/latest/dev/cors.html-->
   <CORSRule>
     <AllowedOrigin>*</AllowedOrigin>
     <AllowedMethod>GET</AllowedMethod>
-    <AllowedMethod>PUT</AllowedMethod>
-    <AllowedMethod>POST</AllowedMethod>
     <AllowedMethod>HEAD</AllowedMethod>
     <MaxAgeSeconds>3000</MaxAgeSeconds>
-    <AllowedHeader>Content-*</AllowedHeader>
-    <AllowedHeader>Access-Control-*</AllowedHeader>
-    <AllowedHeader>Host</AllowedHeader>
-    <ExposeHeader>Access-Control-Allow-Headers</ExposeHeader>
-    <ExposeHeader>Access-Control-Allow-Methods</ExposeHeader>
-    <ExposeHeader>Access-Control-Allow-Origin</ExposeHeader>
+    <AllowedHeader>*</AllowedHeader>
   </CORSRule>
 </CORSConfiguration>
