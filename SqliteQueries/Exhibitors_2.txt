@@ -2,6 +2,7 @@ select o.Id, o.UniqueId, o.CompanyName, o.Phone, o.Fax, o.WebsiteUrl ,
        o.FacilityName, o.Address1, o.Address2, o.CityName, o.StateName, o.PostalCode, o.CountryName, 
        o.Description, o.FacebookUrl, o.TwitterHashTag, o.LogoImageUrl , 
        exh.FeaturedExhibitor as FeaturedExhibitor, exh.Rating, 
+       ifnull((select 1 from Sponsorship where ExhibitorId = o.Id), 0) as IsSponsor,
        (select 1 from private.Rate r where r.RatedUniqueId = o.UniqueId) as IsRated, 
        (select 1 from private.Favorite f where f.FavoritedUniqueId = o.UniqueId) as IsFavorite, 
        exh.BoothNumbers
