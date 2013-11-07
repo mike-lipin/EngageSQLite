@@ -14,7 +14,7 @@ limit @selectNumberOfRecords offset @skipNumberOfRecords
 select Id, RegistrationTypeCode, UniqueId, FirstName, LastName
      , Email, Phone, CompanyName, BusinessTitle, ImageUrl
      , SocialBio, TwitterUrl, FacebookUrl, LinkedInUrl, FirstAlpha
-     , Location
+     , Location, IsReceiveAppointments
 from [Participant]
 where RegistrationTypeCode = 'Speaker'
 order by FirstAlpha, lower(FirstName), lower(LastName)
@@ -26,7 +26,7 @@ limit @selectNumberOfRecords offset @skipNumberOfRecords
 select p.Id, p.RegistrationTypeCode, p.UniqueId, p.FirstName, p.LastName
      , p.Email, p.Phone, p.CompanyName, p.BusinessTitle, p.ImageUrl
      , p.SocialBio, p.TwitterUrl, p.FacebookUrl, p.LinkedInUrl, p.FirstAlpha
-     , p.Location
+     , p.Location, IsReceiveAppointments
 from EventItemParticipant eip
     join Participant p on p.Id = eip.ParticipantId
 where eip.EventItemId = @eventItemId

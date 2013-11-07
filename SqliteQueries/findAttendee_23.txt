@@ -2,7 +2,7 @@
 select p.Id, p.RegistrationTypeCode, p.UniqueId, p.FirstName, p.LastName
      , p.Email, p.Phone, p.CompanyName, p.BusinessTitle, p.ImageUrl
      , p.SocialBio, p.TwitterUrl, p.FacebookUrl, p.LinkedInUrl, p.FirstAlpha
-     , p.Location
+     , p.Location, p.IsReceiveAppointments
 from ParticipantSearch ps
     join [Participant] p on p.Id = ps.Id and p.RegistrationTypeCode = 'Attendee'
 where ps.RegistrationTypeCode = 'Attendee' and ParticipantSearch match 'keyword otherkeyword anotherkeyword'

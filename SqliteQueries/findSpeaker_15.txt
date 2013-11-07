@@ -2,7 +2,7 @@
 select p.Id, p.RegistrationTypeCode, p.UniqueId, p.FirstName, p.LastName
      , p.Email, p.Phone, p.CompanyName, p.BusinessTitle, p.ImageUrl
      , p.SocialBio, p.TwitterUrl, p.FacebookUrl, p.LinkedInUrl, p.FirstAlpha
-     , p.Location
+     , p.Location, p.IsReceiveAppointments
      , (select 1 from private.Rate r where r.RatedUniqueId = p.UniqueId and ifnull(r.Status, '') <> 'deleted') as IsRated
      , (select 1 from private.Favorite f where f.FavoritedUniqueId = p.UniqueId and ifnull(f.Status, '') <> 'deleted') as IsFavorite
 from ParticipantSearch ps
