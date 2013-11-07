@@ -31,7 +31,7 @@ select 'Appointment' as Type, a.UniqueId, a.Location, a.DateFrom, a.Summary as T
 from private.Appointment a
   left join private.Profile cp on 1=1
 where substr(a.DateFrom, 1, 10) = @date
-  and (a.SenderUniqueId = cp.UniqueId or a.ReceiverUniqueId = cp.UniqueId or a.ReceiverUniqueId is null)
+  and (a.SenderUniqueId = cp.UniqueId or a.ReceiverUniqueId = cp.UniqueId)
 
 order by SectionDate, SectionHour, DateFrom, Title
 
@@ -48,5 +48,5 @@ union
 select distinct substr(a.DateFrom, 1, 10) as DateFrom
 from private.Appointment a
   left join private.Profile cp on 1=1
-where (a.SenderUniqueId = cp.UniqueId or a.ReceiverUniqueId = cp.UniqueId or a.ReceiverUniqueId is null)
+where (a.SenderUniqueId = cp.UniqueId or a.ReceiverUniqueId = cp.UniqueId)
 order by DateFrom
