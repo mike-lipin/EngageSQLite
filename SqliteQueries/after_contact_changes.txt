@@ -1,0 +1,9 @@
+---- after any contacts changes you must execute folowing queries in that order ----
+
+    delete from private.ContactSearch
+
+    insert into private.ContactSearch (UniqueId, SearchText)
+    select UniqueId, ifnull(FirstName,'') || ' ' || ifnull(LastName, '') || ' ' || ifnull(CompanyName, '') || ' ' || ifnull(BusinessTitle, '') || ' ' || ifnull(Phone, '')
+    || ' ' || ifnull(Email, '') || ' ' || ifnull(FacilityName, '') || ' ' || ifnull(Address1, '') || ' ' || ifnull(Address2, '') || ' ' || ifnull(CityName, '') || ' ' || ifnull(StateName, '')
+    || ' ' || ifnull(PostalCode, '') || ' ' || ifnull(CountryName, '') || ' ' || ifnull(SocialBio, '')
+    from private.Contact

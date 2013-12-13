@@ -25,3 +25,17 @@ order by lower(FirstName), lower(LastName)
 limit @selectNumberOfRecords offset @skipNumberOfRecords
 
 ---- replace findstr by your keyword in lowercase, but % must be here. for example, if you search "joe" you must place: lower(Name) like '%joe%'
+
+---- find contact by keyword ----
+
+SELECT c.*
+FROM 
+	private.ContactSearch as cs
+	join private.[Contact] as c
+		on c.UniqueId = cs.UniqueId
+where private.ContactSearch match 'keyword otherkeyword anotherkeyword'
+order by lower(c.FirstName), lower(c.LastName)
+limit @selectNumberOfRecords offset @skipNumberOfRecords
+
+---- just replace 'keyword otherkeyword anotherkeyword' with your search string ----
+
