@@ -50,3 +50,14 @@ from private.Appointment a
   left join private.Profile cp on 1=1
 where (a.SenderUniqueId = cp.UniqueId or a.ReceiverUniqueId = cp.UniqueId)
 order by DateFrom
+
+
+----
+select substr(min(ei.DateFrom),1,10) RangeStart, substr(max(ei.DateTo),1,10) RangeEnd 
+from EventItem ei
+  join private.ScheduledItem si on ei.UniqueId = si.ItemUniqueId
+union
+select substr(min(a.DateFrom), 1, 10), substr(max(a.DateFrom),1,10)
+from private.Appointment a
+  left join private.Profile cp on 1=1
+where (a.SenderUniqueId = cp.UniqueId or a.ReceiverUniqueId = cp.UniqueId)
