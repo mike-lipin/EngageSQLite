@@ -14,9 +14,20 @@
 
     insert into EventItemSearch (Id, SearchText, Speakers)
     select ei.Id, ifnull(ei.Title, '') || ' ' || ifnull(ei.Description, '') || ' ' || ifnull(ei.Location, ''),
-      (select trim(group_concat(' ' || trim(ifnull(p.FirstName, '') || ' ' || ifnull(p.LastName, ''))))
-       from EventItemParticipant eip join Participant p on p.Id = eip.ParticipantId 
-       where eip.EventItemId = ei.Id)
+    (
+    select trim(group_concat(fio))
+    from
+    (
+    select
+    ' ' || trim(ifnull(p.FirstName, '') || ' ' || ifnull(p.LastName, '')) as fio
+    from
+    EventItemParticipant eip
+    join Participant p
+    on p.Id = eip.ParticipantId
+    where eip.EventItemId = ei.Id
+    order by p.LastAlpha, lower(p.LastName), lower(p.FirstName)
+    )
+    )
     from [EventItem] ei
 
     insert into ExhibitorSearch (Id, SearchText, BoothNumbers)

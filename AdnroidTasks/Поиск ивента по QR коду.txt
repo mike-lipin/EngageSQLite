@@ -1,0 +1,1 @@
+При сканировании QR кода ивента необходимо дернуть апи http://client.exp.quotient.net/api/v1.0/event?eventCode=<EventCode>

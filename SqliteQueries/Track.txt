@@ -4,3 +4,17 @@ select Id, UniqueId, Name
 from [Track] t
 order by lower(Name)
 limit @selectNumberOfRecords offset @skipNumberOfRecords
+
+
+-- for speaker filter
+select Id, UniqueId, Name
+     , (select 1 from private.Rate r where r.RatedUniqueId = t.UniqueId and ifnull(r.Status, '') <> 'deleted') as IsRated
+     , (select 1 from private.Favorite f where f.FavoritedUniqueId = t.UniqueId and ifnull(f.Status, '') <> 'deleted') as IsFavorite
+     , (select count(distinct eip.ParticipantId) 
+        from EventItemTrack eit 
+          join EventItemParticipant eip on eip.EventItemId = eit.EventItemId 
+        where eit.TrackId = t.Id) as SpeakerCount
+from [Track] t
+where exists(select 1 from EventItemTrack eit join EventItemParticipant eip on eip.EventItemId = eit.EventItemId where eit.TrackId = t.Id)
+order by lower(Name)
+limit @selectNumberOfRecords offset @skipNumberOfRecords
