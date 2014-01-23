@@ -3,6 +3,7 @@
     update Booth
     set FloorMapIds = ifnull((select trim(group_concat(distinct ' ' || bc.FloorMapId)) 
                               from BoothCoordinate bc 
+                                join FloorMap fm on fm.Id = bc.FloorMapId and fm.IsEnabled = 1
                               where bc.BoothId = Booth.Id 
                               order by bc.FloorMapId), FloorMapId)
 
@@ -111,14 +112,16 @@
 	delete from FullFloorMapExhibitor
 	
     insert or replace into FullFloorMapExhibitor (FloorMapId, ExhibitorId)
-    select FloorMapId, ExhibitorId
-    from FloorMapExhibitor
+    select fme.FloorMapId, fme.ExhibitorId
+    from FloorMapExhibitor fme
+      join FloorMap fm on fm.Id = fme.FloorMapId and fm.IsEnabled = 1
     union
     select bc.FloorMapId, eb.ExhibitorId
     from ExhibitorBooth eb
       join BoothCoordinate bc on eb.BoothId = bc.BoothId
+      join FloorMap fm on fm.Id = bc.FloorMapId and fm.IsEnabled = 1
     union
     select b.FloorMapId, eb.ExhibitorId
     from ExhibitorBooth eb
       join Booth b on b.Id = eb.BoothId
-      where b.FloorMapId is not null
+      join FloorMap fm on fm.Id = b.FloorMapId and fm.IsEnabled = 1
